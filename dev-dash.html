@@ -1,0 +1,475 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Catalyst | Dev</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="/catalyst-web/css/dashboards/dev/dev.css">
+    <link rel="stylesheet" href="/catalyst-web/css/dashboards/dev/main.css">
+    <link rel="stylesheet" href="/catalyst-web/css/dashboards/dev/nav.css">
+    <style>
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: #0a0a0a;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background: #0a0a0a;
+            color: #fff;
+            line-height: 1.6;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="sidebar">
+        <div class="logo">
+            <h1>Catalyst</h1>
+            <span>Anticheat Developer</span>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">Main</div>
+            <div class="nav-item active" data-page="dashboard">
+                <i class="fas fa-chart-line"></i>
+                <span>Dashboard</span>
+            </div>
+            <div class="nav-item" data-page="api-keys">
+                <i class="fas fa-key"></i>
+                <span>API Keys</span>
+            </div>
+            <div class="nav-item" data-page="accounts">
+                <i class="fas fa-users"></i>
+                <span>User Accounts</span>
+            </div>
+        </div>
+
+        <div class="nav-section">
+            <div class="nav-section-title">System</div>
+            <div class="nav-item" data-page="games">
+                <i class="fas fa-gamepad"></i>
+                <span>Active Games</span>
+            </div>
+            <div class="nav-item" data-page="logout">
+                <i class="fas fa-sign-out-alt"></i>
+                <span>Logout</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="main-content">
+        <div id="errorMessage" style="display: none;"></div>
+        <div id="successMessage" style="display: none;"></div>
+
+        <!-- dashboard home page -->
+        <div id="dashboard-page" class="page">
+            <div class="header">
+                <div class="header-left">
+                    <h2>Developer Dashboard</h2>
+                    <p>full system access and analytics</p>
+                </div>
+                <button class="btn" onclick="refreshData()">
+                    <i class="fas fa-sync"></i>
+                    Refresh
+                </button>
+            </div>
+
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <div class="stat-label">Total Detections</div>
+                    <div class="stat-value" id="totalEvents">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total API Calls</div>
+                    <div class="stat-value" id="totalApiCalls">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Active Games</div>
+                    <div class="stat-value" id="activeGames">-</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-label">Total Users</div>
+                    <div class="stat-value" id="totalUsers">-</div>
+                </div>
+            </div>
+
+            <div class="section">
+                <div class="section-header">
+                    <h3 class="section-title">System Overview</h3>
+                </div>
+                <div id="systemOverview">
+                    <table>
+                        <tr>
+                            <td>Total Game Owners</td>
+                            <td id="totalOwners">-</td>
+                        </tr>
+                        <tr>
+                            <td>Total Staff Members</td>
+                            <td id="totalStaff">-</td>
+                        </tr>
+                        <tr>
+                            <td>API Keys Generated</td>
+                            <td id="apiKeysCount">-</td>
+                        </tr>
+                        <tr>
+                            <td>System Status</td>
+                            <td><span class="badge active">ONLINE</span></td>
+                        </tr>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- api key creation page -->
+        <div id="api-keys-page" class="page" style="display: none;">
+            <div class="header">
+                <div class="header-left">
+                    <h2>API Key Management</h2>
+                    <p>create and manage api keys for game integrations</p>
+                </div>
+                <button class="btn" onclick="openModal('createApiKey')">
+                    <i class="fas fa-plus"></i>
+                    Generate New Key
+                </button>
+            </div>
+
+            <div class="section">
+                <div id="apiKeysContainer"></div>
+            </div>
+        </div>
+
+        <!-- active accounts -->
+        <div id="accounts-page" class="page" style="display: none;">
+            <div class="header">
+                <div class="header-left">
+                    <h2>User Account Management</h2>
+                    <p>create and manage game owner and staff accounts</p>
+                </div>
+                <button class="btn" onclick="openModal('createAccount')">
+                    <i class="fas fa-user-plus"></i>
+                    Create Account
+                </button>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title" style="margin-bottom: 1.5rem;">Game Owners</h3>
+                <div id="ownersContainer"></div>
+            </div>
+
+            <div class="section">
+                <h3 class="section-title" style="margin-bottom: 1.5rem;">Staff Members</h3>
+                <div id="staffContainer"></div>
+            </div>
+        </div>
+
+        <!-- active games -->
+        <div id="games-page" class="page" style="display: none;">
+            <div class="header">
+                <div class="header-left">
+                    <h2>Active Games</h2>
+                    <p>view all games using catalyst anticheat</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <div id="gamesContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- api key creation from website-->
+    <div id="createApiKey" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Generate New API Key</h3>
+                <button class="close-btn" onclick="closeModal('createApiKey')">&times;</button>
+            </div>
+            <form id="apiKeyForm">
+                <div class="form-group">
+                    <label class="form-label">Key Name</label>
+                    <input type="text" class="form-input" id="keyName" placeholder="e.g. Production API Key" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Game Name</label>
+                    <input type="text" class="form-input" id="gameName" placeholder="e.g. My Roblox Game" required>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Generate Key</button>
+            </form>
+            <div id="generatedKey" style="display: none;">
+                <div class="success-message" style="margin-top: 1.5rem;">
+                    API Key generated successfully! Copy it now - you won't be able to see it again.
+                </div>
+                <div class="api-key-display">
+                    <code id="apiKeyValue"></code>
+                    <button class="copy-btn" onclick="copyApiKey()">Copy</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- account creation ui -->
+    <div id="createAccount" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Create User Account</h3>
+                <button class="close-btn" onclick="closeModal('createAccount')">&times;</button>
+            </div>
+            <form id="accountForm">
+                <div class="form-group">
+                    <label class="form-label">Username</label>
+                    <input type="text" class="form-input" id="accountUsername" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Password</label>
+                    <input type="password" class="form-input" id="accountPassword" required>
+                </div>
+                <div class="form-group">
+                    <label class="form-label">Role</label>
+                    <select class="form-select" id="accountRole" required>
+                        <option value="">Select role...</option>
+                        <option value="dev">Developer</option>
+                        <option value="owner">Game Owner</option>
+                        <option value="staff">Staff Member</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Create Account</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- api key assigning ui -->
+    <div id="assignKeyModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3>Assign API Key to Owner</h3>
+                <button class="close-btn" onclick="closeModal('assignKeyModal')">&times;</button>
+            </div>
+            <form id="assignKeyForm">
+                <input type="hidden" id="assignKeyId">
+                <div class="form-group">
+                    <label class="form-label">Select Game Owner</label>
+                    <select class="form-select" id="assignOwnerId" required>
+                        <option value="">Loading owners...</option>
+                    </select>
+                </div>
+                <button type="submit" class="btn" style="width: 100%;">Assign Key</button>
+            </form>
+        </div>
+    </div>
+
+    <script src="/catalyst-web/js/dev-dashboard/dash.js"></script>
+    <script>
+
+        // loaders
+        async function loadStats() {
+            try {
+                const response = await makeRequest(`${API_URL}/api/dashboard/stats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('totalEvents').textContent = data.stats.total_events || 0;
+                    document.getElementById('totalApiCalls').textContent = data.stats.total_api_calls || 0;
+                    document.getElementById('activeGames').textContent = data.stats.active_games || 0;
+                    document.getElementById('totalUsers').textContent = (data.stats.total_owners || 0) + (data.stats.total_staff || 0);
+                    document.getElementById('totalOwners').textContent = data.stats.total_owners || 0;
+                    document.getElementById('totalStaff').textContent = data.stats.total_staff || 0;
+                }
+            } catch (error) {
+                showError('Failed to load statistics');
+            }
+        }
+
+        async function loadApiKeys() {
+            try {
+                const response = await makeRequest(`${API_URL}/api/keys/list`);
+                const data = await response.json();
+
+                const container = document.getElementById('apiKeysContainer');
+                document.getElementById('apiKeysCount').textContent = data.keys?.length || 0;
+
+                if (!data.keys || data.keys.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-key"></i><h3>No API keys</h3><p>Generate an API key to get started</p></div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Key Name</th>
+                                <th>Game Name</th>
+                                <th>Owner</th>
+                                <th>API Calls</th>
+                                <th>Status</th>
+                                <th>Created</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.keys.map(key => `
+                                <tr>
+                                    <td>${key.name}</td>
+                                    <td>${key.game_name}</td>
+                                    <td>${key.owner_id || 'Unassigned'}</td>
+                                    <td>${key.total_calls || 0}</td>
+                                    <td><span class="badge ${key.is_active ? 'active' : 'inactive'}">${key.is_active ? 'Active' : 'Inactive'}</span></td>
+                                    <td>${new Date(key.created_at).toLocaleDateString()}</td>
+                                    <td>
+                                        ${!key.owner_id ? `<button class="action-btn" onclick="openAssignModal('${key.key_id}')">Assign</button>` : ''}
+                                    </td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                showError('Failed to load API keys');
+            }
+        }
+
+        async function loadOwners() {
+            try {
+                const response = await makeRequest(`${API_URL}/api/users/owners`);
+                const data = await response.json();
+
+                const container = document.getElementById('ownersContainer');
+
+                if (!data.owners || data.owners.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-user"></i><p>No game owners yet</p></div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>User ID</th>
+                                <th>Game ID</th>
+                                <th>Created</th>
+                                <th>Last Login</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.owners.map(owner => `
+                                <tr>
+                                    <td>${owner.username}</td>
+                                    <td><code>${owner.user_id}</code></td>
+                                    <td>${owner.game_id || 'Not assigned'}</td>
+                                    <td>${new Date(owner.created_at).toLocaleDateString()}</td>
+                                    <td>${owner.last_login ? new Date(owner.last_login).toLocaleString() : 'Never'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                showError('Failed to load owners');
+            }
+        }
+
+        async function loadStaff() {
+            try {
+                const response = await makeRequest(`${API_URL}/api/users/staff`);
+                const data = await response.json();
+
+                const container = document.getElementById('staffContainer');
+
+                if (!data.staff || data.staff.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-users"></i><p>No staff members yet</p></div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Username</th>
+                                <th>User ID</th>
+                                <th>Game ID</th>
+                                <th>Created</th>
+                                <th>Last Login</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.staff.map(staff => `
+                                <tr>
+                                    <td>${staff.username}</td>
+                                    <td><code>${staff.user_id}</code></td>
+                                    <td>${staff.game_id || 'Not assigned'}</td>
+                                    <td>${new Date(staff.created_at).toLocaleDateString()}</td>
+                                    <td>${staff.last_login ? new Date(staff.last_login).toLocaleString() : 'Never'}</td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                showError('Failed to load staff');
+            }
+        }
+
+        async function loadGames() {
+            try {
+                const response = await makeRequest(`${API_URL}/api/games/active`);
+                const data = await response.json();
+
+                const container = document.getElementById('gamesContainer');
+
+                if (!data.games || data.games.length === 0) {
+                    container.innerHTML = '<div class="empty-state"><i class="fas fa-gamepad"></i><h3>No active games</h3><p>Games will appear here when API keys are assigned</p></div>';
+                    return;
+                }
+
+                container.innerHTML = `
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Game Name</th>
+                                <th>Game ID</th>
+                                <th>Owner</th>
+                                <th>Staff Count</th>
+                                <th>Created</th>
+                                <th>Status</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${data.games.map(game => `
+                                <tr>
+                                    <td>${game.game_name}</td>
+                                    <td><code>${game.game_id}</code></td>
+                                    <td>${game.owner_id}</td>
+                                    <td>${game.staff_ids?.length || 0}</td>
+                                    <td>${new Date(game.created_at).toLocaleDateString()}</td>
+                                    <td><span class="badge ${game.active ? 'active' : 'inactive'}">${game.active ? 'Active' : 'Inactive'}</span></td>
+                                </tr>
+                            `).join('')}
+                        </tbody>
+                    </table>
+                `;
+            } catch (error) {
+                showError('Failed to load games');
+            }
+        }
+
+    </script>
+</body>
+</html>
