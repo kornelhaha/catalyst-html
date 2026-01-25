@@ -1,3 +1,5 @@
+        /* home page of the dashboard */
+
         .main-content {
             margin-left: 250px;
             padding: 2rem;
@@ -42,6 +44,8 @@
             border: 1px solid #1a1a1a;
         }
 
+        
+        /* api stats */
         .stats-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
