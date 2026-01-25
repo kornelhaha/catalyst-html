@@ -4,12 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Catalyst | Dev</title>
+
+    <!-- linking the main css files + icon lib-->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="stylesheet" href="/catalyst-web/css/dashboards/dev/dev.css">
     <link rel="stylesheet" href="/catalyst-web/css/dashboards/dev/main.css">
     <link rel="stylesheet" href="/catalyst-web/css/dashboards/dev/nav.css">
     <style>
 
+        /* a custom thin scrollbar*/
         * {
             margin: 0;
             padding: 0;
@@ -40,12 +43,14 @@
     </style>
 </head>
 <body>
+    <!-- this shows the role of the user, currently anticheat dev-->
     <div class="sidebar">
         <div class="logo">
             <h1>Catalyst</h1>
             <span>Anticheat Developer</span>
         </div>
 
+        <!-- navigation for the dashboard -->
         <div class="nav-section">
             <div class="nav-section-title">Main</div>
             <div class="nav-item active" data-page="dashboard">
@@ -75,6 +80,7 @@
         </div>
     </div>
 
+    <!-- these get called when i try to delete an api key or assign one or delete/create an account-->
     <div class="main-content">
         <div id="errorMessage" style="display: none;"></div>
         <div id="successMessage" style="display: none;"></div>
@@ -91,7 +97,7 @@
                     Refresh
                 </button>
             </div>
-
+            <!-- some stats displayed by my API-->
             <div class="stats-grid">
                 <div class="stat-card">
                     <div class="stat-label">Total Detections</div>
@@ -111,6 +117,7 @@
                 </div>
             </div>
 
+            <!-- again, stats displayed by my API pulled from the database -->
             <div class="section">
                 <div class="section-header">
                     <h3 class="section-title">System Overview</h3>
@@ -278,7 +285,7 @@
     <script src="/catalyst-web/js/dev-dashboard/dash.js"></script>
     <script>
 
-        // loaders
+        // stat loader
         async function loadStats() {
             try {
                 const response = await makeRequest(`${API_URL}/api/dashboard/stats`);
@@ -296,7 +303,7 @@
                 showError('Failed to load statistics');
             }
         }
-
+        // available api keys loader
         async function loadApiKeys() {
             try {
                 const response = await makeRequest(`${API_URL}/api/keys/list`);
@@ -344,7 +351,8 @@
                 showError('Failed to load API keys');
             }
         }
-
+        
+        // loads owner accounts
         async function loadOwners() {
             try {
                 const response = await makeRequest(`${API_URL}/api/users/owners`);
@@ -385,7 +393,8 @@
                 showError('Failed to load owners');
             }
         }
-
+        
+        // loads staff accounts
         async function loadStaff() {
             try {
                 const response = await makeRequest(`${API_URL}/api/users/staff`);
@@ -427,6 +436,7 @@
             }
         }
 
+        // loads all active games (basically gets the count of assigned APIs)
         async function loadGames() {
             try {
                 const response = await makeRequest(`${API_URL}/api/games/active`);
