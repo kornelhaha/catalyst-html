@@ -1,3 +1,4 @@
+        /* system overview*/
         .section {
             background: #0d0d0d;
             border: 1px solid #1a1a1a;
@@ -17,6 +18,7 @@
             font-weight: 700;
         }
 
+        /* table for the stats */
         table {
             width: 100%;
             border-collapse: collapse;
@@ -41,6 +43,7 @@
             background: rgba(255, 255, 255, 0.02);
         }
 
+        /* game badge */
         .badge {
             padding: 0.3rem 0.8rem;
             font-size: 0.75rem;
@@ -58,6 +61,7 @@
             color: #ef4444;
         }
 
+        /* modal for api creation, assigning, account creation*/
         .modal {
             display: none;
             position: fixed;
@@ -100,6 +104,7 @@
             font-size: 1.5rem;
         }
 
+        /* parts of the modals */
         .form-group {
             margin-bottom: 1.5rem;
         }
@@ -125,6 +130,7 @@
             border-color: #fff;
         }
 
+        /* displays the generated api key*/
         .api-key-display {
             background: #0a0a0a;
             border: 1px solid #1a1a1a;
@@ -136,6 +142,7 @@
             margin-top: 1rem;
         }
 
+        /* copy btn for the new api key*/
         .copy-btn {
             background: transparent;
             border: 1px solid #1a1a1a;
@@ -177,6 +184,7 @@
             font-size: 0.9rem;
         }
 
+        /* the assign/unassign button for owners*/
         .action-btn {
             background: transparent;
             border: 1px solid #1a1a1a;
